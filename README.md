@@ -2,10 +2,10 @@
 AWS local dev environment good practices.
 
 ## Introduction
-Thsi is a set of gneral good practices for setting up AWS for local development from private users point of view not commercial.  As we are dealing with pure Infra Terraform will be used to achieve this.
+This is a set of gneral good practices for setting up AWS for local development from private users point of view not commercial.  As we are dealing with pure Infra Terraform will be used to achieve this.
 
 ## Objective 
-The final goal is to not use the AWS root account and have 2 dedicated accounts and VPC's for each one, this is generalgood practive from a security point of view.  The basic concept each account should only be able to do what is reuired.
+The final goal is to not use the AWS root account and have 2 dedicated accounts and VPC's for each one, this is general good practive from a security point of view.  The basic concept each account should only be able to do what is reuired (least pridledge model).
 
 ## Steps
 
