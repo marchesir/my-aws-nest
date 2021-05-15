@@ -1,16 +1,18 @@
-# AWS Local Dev Environment
-AWS local dev environment good practices.
-
 ## Introduction
-This is a set of gneral good practices for setting up AWS for local development from private users point of view not commercial.  As we are dealing with pure Infra Terraform will be used to achieve this.
+Repo containing resoures for learning Kubernetes (K8s) from the bottom up.
 
-## Objective 
-The final goal is to not use the AWS root account and have 2 dedicated accounts and VPC's for each one, this is general good practive from a security point of view.  The basic concept each account should only be able to do what is reuired (least pridledge model).
+## Objectives
+Use https://github.com/kelseyhightower/kubernetes-the-hard-way as a starting point to lean the inner workings of K8s.
+
+## Environment
+AWS: simple setup:
+1. root account with MFA: do not touch;
+2. admin user with MFA: to be used to all work; *
+3. dedicated restricted API only (no console access) for K8s resources;
+
+* to be split into admin only account and dev account at some point in future.
 
 ## Steps
 
-Assumption: AWS had been setup with MFA as reccomended and Terraform setup locally ([Terraform Setup](https://learn.hashicorp.com/terraform/getting-started/install.html)).  Later all local dev will reside only on AWS, but for initial setup local dev pc is required.
-
-1. Login into root account and create 2 accounts as such:
-   * <name>dev: eg. richardev
-   * <name>admin: eg richardadmin
+1. from admin accountutilize AWS cloud shell for work;
+2. initally we will use bash to "automate infra";
