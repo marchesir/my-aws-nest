@@ -1,7 +1,7 @@
 .PHONY: build
 build:
 	mkdir -p bin
-	go build -trimpath -o bin/single-dev-env
+	go build -trimpath -o bin/astro
 
 .PHONY: run
 run:
