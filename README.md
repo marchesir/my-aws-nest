@@ -1,6 +1,8 @@
 ## Introduction
-Repo containing resoures for learning Kubernetes (K8s) from the bottom up.
 
-## Links
-https://tutorialedge.net/golang/consuming-restful-api-with-go/
-https://github.com/nasa/apod-api
+System to manage AWS IAM with main aim to reduce any need to use AWS root account by using admin user that will be used .  Users and their respective roles should be easily configurable.
+
+## Tools
+* pulumi: https://www.pulumi.com 
+* nix: https://nixos.org
+* go: https://go.dev
