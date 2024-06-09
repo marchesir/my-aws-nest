@@ -6,3 +6,6 @@ System to manage AWS IAM with main aim to reduce any need to use AWS root accoun
 * pulumi: https://www.pulumi.com 
 * nix: https://nixos.org
 * go: https://go.dev
+
+
+arn:aws:iam::916710000942:role/pulumi-esc-oidc

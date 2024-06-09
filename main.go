@@ -12,7 +12,7 @@ func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		// Create an AWS resource (S3 Bucket).
 
-		// Append current time in secs tomake bucket name unique.
+		// Append current time in secs to make bucket name unique.
 		uniqueBucket := fmt.Sprintf("my-bucket-%d", time.Now().Unix())
 
 		// Invoke pulumi S3 API to create the bucket.
