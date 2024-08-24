@@ -1,3 +1,3 @@
 name: my-aws-iam
 runtime: go
-description: 'AWS IAM management. '
+description: 'AWS IAM management.'
