@@ -2,27 +2,38 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"os"
 
-	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/s3"
+	"github.com/pulumi/pulumi-aws/sdk/v4/go/aws/ec2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
+// AWS_REGION_REGEX_STRICT = r"^(us|eu|ap|ca|sa)-(east|west|north|south|central|southeast|northeast)-\d{1}$"
+// ADJECTIVES = ["Cool","Fast","Bold","Calm","Sharp","Quick","Keen","Brave","Happy","Proud"]
+// NOUNS = ["Panda","Tiger","Wolf","Bear","Eagle","Fox","Deer","Owl","Lion","Hawk"]
+
+// Utility function to check for errors and print to STDOUT and exit.
+func checkErr(err error) {
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// Function to create a VPC
+func createVpc(ctx *pulumi.Context) *ec2.Vpc {
+	vpc, err := ec2.NewVpc(ctx, "vpc", nil)
+	checkErr(err)
+	return vpc
+}
+
+// Main entry point for the Pulumi program.
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		// Create an AWS resource (S3 Bucket).
-
-		// Append current time in secs to make bucket name unique.
-		uniqueBucket := fmt.Sprintf("my-bucket-%d", time.Now().Unix())
-
-		// Invoke pulumi S3 API to create the bucket.
-		bucket, err := s3.NewBucket(ctx, uniqueBucket, nil)
-		if err != nil {
-			return err
+		vpcConfig, _ := ctx.GetConfig("my-aws-nest:vpc")
+		if vpcConfig != "" {
+			createVpc(ctx)
 		}
-
-		// Export the name of the bucket
-		ctx.Export("bucketName", bucket.ID())
 		return nil
 	})
 }

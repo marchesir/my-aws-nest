@@ -1,3 +1,4 @@
-name: my-aws-iam
-runtime: go
-description: 'AWS IAM management.'
+name: my-aws-nest
+runtime:
+  name: go
+description: Personal AWS account infrastructure.
