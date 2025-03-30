@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pulumi/pulumi-aws/sdk/v4/go/aws/ec2"
+	"github.com/pulumi/pulumi-aws/sdk/v5/go/aws/ec2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
@@ -22,7 +22,15 @@ func checkErr(err error) {
 
 // Function to create a VPC
 func createVpc(ctx *pulumi.Context) *ec2.Vpc {
-	vpc, err := ec2.NewVpc(ctx, "vpc", nil)
+	vpc, err := ec2.NewVpc(
+		ctx,
+		"myvpc",
+		&ec2.VpcArgs{
+			CidrBlock: pulumi.String("10.0.0.0/16"),
+			Tags: pulumi.StringMap{
+				"Name": pulumi.String("myvpc"),
+			},
+		})
 	checkErr(err)
 	return vpc
 }
@@ -31,6 +39,8 @@ func createVpc(ctx *pulumi.Context) *ec2.Vpc {
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 		vpcConfig, _ := ctx.GetConfig("my-aws-nest:vpc")
+
+		print("VPC Config: ", vpcConfig)
 		if vpcConfig != "" {
 			createVpc(ctx)
 		}
