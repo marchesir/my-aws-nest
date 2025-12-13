@@ -2,33 +2,29 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
-	"time"
+	"strings"
 
-	"github.com/pulumi/pulumi-aws/sdk/v5/go/aws/ec2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
-	"gopkg.in/yaml.v2"
+	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
 )
 
-const (
-	AWS_REGION_REGEX = `^(us|eu|ap|ca|sa)-(east|west|north|south|central|southeast|northeast)-\d{1}$`
-	ADJECTIVES       = `["Cool", "Fast", "Bold", "Calm", "Sharp", "Quick", "Keen", "Brave", "Happy", "Proud"]`
-	NOUNS            = `["Panda", "Tiger", "Wolf", "Bear", "Eagle", "Fox", "Deer", "Owl", "Lion", "Hawk"]`
-)
-
-type subnet struct {
-	CidrBlock string `json:"cidrBlock"`
-	Type      string `json:"type"` // "private" or "public"
+type NodePoolConfig struct {
+	Name         string `json:"name"`
+	InstanceType string `json:"instanceType"`
+	MinSize      int    `json:"minSize"`
+	MaxSize      int    `json:"maxSize"`
 }
 
-type vpc struct {
-	CidrBlock string   `json:"cidrBlock"`
-	Subnets   []subnet `json:"subnets"`
+type VpcConfig struct {
+	Cidr    string `json:"cidr"`
+	AzCount int    `json:"azCount"`
 }
 
-type vpcConfig struct {
-	VPCs []vpc `json:"vpcs" yaml:"vpcs"`
+type EksConfig struct {
+	Vpc               *VpcConfig       `json:"vpc,omitempty"`
+	KubernetesVersion string           `json:"kubernetesVersion,omitempty"`
+	NodePools         []NodePoolConfig `json:"nodePools,omitempty"`
 }
 
 // Utility function to check for errors and print to STDOUT and exit.
@@ -39,84 +35,55 @@ func checkErr(err error) {
 	}
 }
 
-// Generate a unique name for AWS resources
-func generateResourceName(resourceType, appName string) string {
-	// Seed the random generator.
-	rand.Seed(time.Now().UnixNano())
-
-	// Pick a random adjective and noun.
-	adjective := ADJECTIVES[rand.Intn(len(ADJECTIVES))]
-	noun := NOUNS[rand.Intn(len(NOUNS))]
-
-	// Generate a random suffix for uniqueness
-	randomSuffix := rand.Intn(10000)
+// Generate a unique name for AWS resources.
+func generateResourceName(name string, region string, resourceType string) string {
+	// Convert region to a short code.
+	shortRegion := strings.ReplaceAll(region, "-", "")
+	// Remove letters after the last dash if you prefer just letters+number
+	// For example, "eu-west-2" -> "euw2"
+	// Already handled by removing dashes
 
 	// Combine parts to form the resource name.
-	return fmt.Sprintf("%s-%s%s-%s-%04d", resourceType, adjective, noun, randomSuffix)
+	return fmt.Sprintf("%s-%s-%s", name, shortRegion, resourceType)
 }
 
-// Parse the VPC configuration from the Pulumi.vpc stack YAML.
-func parseVPCConfig(ctx *pulumi.Context) (*vpcConfig, error) {
-	// Retrieve the raw configuration as a string.
-	rawConfig, _ := ctx.GetConfig("my-aws-nest:vpc")
-	if rawConfig == "" {
-		return nil, fmt.Errorf("Configuration not found for key: my-aws-nest:vpc")
-	}
-
-	// Unmarshal the YAML into the vpcConfig struct.
-	var config vpcConfig
-	err := yaml.Unmarshal([]byte(rawConfig), &config)
-	checkErr(err)
-
-	return &config, nil
+func parseEksConfig(cfg *config.Config) (*EksConfig, error) {
+	// TODO: Parse EKS-specific configuration.
+	return &EksConfig{
+		KubernetesVersion: "1.33",
+		Vpc:               nil,
+		NodePools:         nil,
+	}, nil
 }
 
-func createVPCs(ctx *pulumi.Context, config *vpcConfig) error {
-	for _, v := range config.VPCs {
-		// Create the VPC.
-		vpc, err := ec2.NewVpc(
-			ctx,
-			"vpc-TODO",
-			&ec2.VpcArgs{
-				CidrBlock: pulumi.String(v.CidrBlock),
-				Tags: pulumi.StringMap{
-					"Name": pulumi.String("vpc-TODO"),
-				},
-			},
-		)
-		checkErr(err)
-
-		// Create subnets for the VPC.
-		for _, s := range v.Subnets {
-			_, err := ec2.NewSubnet(
-				ctx,
-				"subnet-TODO",
-				&ec2.SubnetArgs{
-					CidrBlock:           pulumi.String(s.CidrBlock),
-					VpcId:               vpc.ID(),
-					MapPublicIpOnLaunch: pulumi.Bool(s.Type == "public"),
-					Tags: pulumi.StringMap{
-						"Name": pulumi.String("subnet-TODO"),
-					},
-				},
-			)
-			checkErr(err)
-		}
-	}
-	return nil
-}
-
-// Main entry point for the Pulumi program.
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		// Parse the VPC configuration.
-		config, err := parseVPCConfig(ctx)
-		checkErr(err)
+		// Load root config.
+		cfg := config.New(ctx, "")
+		// Read common required values: type, region, name.
+		stackType := cfg.Get("type")
+		if stackType == "" {
+			// TODO: error out if no type is set.
+		}
+		region := cfg.Get("aws:region")
+		if region == "" {
+			// TODO: error out if no region is set.
+		}
+		name := cfg.Get("name")
+		if name == "" {
+			// TODO: error out if no name is set.
+		}
 
-		// Create the VPCs and any linked resources.
-		err = createVPCs(ctx, config)
-		checkErr(err)
-
+		// Dispatch based on type.
+		switch stackType {
+		case "eks":
+			// Parse EKS config.
+			eksConfig, err := parseEksConfig(cfg)
+			checkErr(err)
+			fmt.Printf("EKS Config: %+v\n", eksConfig)
+		default:
+			return fmt.Errorf("unknown type: %s", stackType)
+		}
 		return nil
 	})
 }

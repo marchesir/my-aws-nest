@@ -1,0 +1,16 @@
+config:
+  aws:region: eu-west-2
+  type: eks
+  name: cleverpanda
+  # vpc:
+    #cidr: 10.0.0.0/16
+    # azCount: 3
+  #kubernetesVersion: "1.33"
+  #nodePools:
+  #  - name: system
+  #    instanceType: t3.medium
+  #    minSize: 1
+  #    maxSize: 3
+  environment:
+    # Depending on the service, you will need Pulumi ESC environment that provides the required IAM roles.
+    - global/esc-aws-eksfull
