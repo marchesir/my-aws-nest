@@ -2,10 +2,10 @@ config:
   aws:region: eu-west-2
   type: eks
   name: cleverpanda
-  #cidr: 10.0.0.0/16
+  #cidr: "10.0.0.0/20"
   #azCount: 3
   #kubernetesVersion: "1.33"
-  #instanceType: t3.medium
+  #instanceType: "t3.medium"
   #autoScaling: false
   #minSize: 1
   #maxSize: 3

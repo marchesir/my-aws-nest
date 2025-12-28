@@ -65,7 +65,7 @@ func parseEksConfig(cfg *config.Config) *EksConfig {
 	}
 	vpcCidr := cfg.Get("vpcCidr")
 	if vpcCidr == "" {
-		vpcCidr = "10.0.0.0/16"
+		vpcCidr = "10.0.0.0/20"
 	}
 	azCount := cfg.GetInt("azCount")
 	if azCount == 0 {
